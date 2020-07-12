@@ -57,6 +57,7 @@ public class JSONClient {
 
         long endTime = System.currentTimeMillis();
         System.out.println("Total time(ms) = "+(endTime-startTime));
+        System.exit(0);
     }
 
     private static ChannelSftp connectToSFTP() {
