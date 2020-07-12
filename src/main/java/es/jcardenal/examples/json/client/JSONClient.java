@@ -11,7 +11,6 @@ import org.jsfr.json.JsonSurferJackson;
 import org.jsfr.json.compiler.JsonPathCompiler;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -28,7 +27,7 @@ public class JSONClient {
 
     public static void main(String[] args) throws IOException, SftpException {
         String url = args[0];
-        String outputFileName = "/upload/theFile.xml";
+        String outputFileName = "/share/theFile.xml";
         long startTime = System.currentTimeMillis();
         System.out.println("Reading from "+url);
         URL sourceURL = new URL(url);
@@ -62,10 +61,10 @@ public class JSONClient {
 
     private static ChannelSftp connectToSFTP() {
         String username = "foo";
-        String host = "localhost";
-        String pass = "pass";
+        String host = "sftp.local";
+        String passPhrase = "passPhrase";
         String khfile = "~/.ssh/known_hosts";
-        String identityfile = "~/.ssh/id_rsa";
+        String identityfile = "~/host/id_rsa";
         int port = 2222;
 
         JSch jsch;
@@ -76,14 +75,8 @@ public class JSONClient {
             jsch.setKnownHosts(khfile);
 
             session = jsch.getSession(username, host, port);
-            session.setPassword(pass);
 
-            /* Disable strict checking of host key*/
-            java.util.Properties config = new java.util.Properties();
-            config.put("StrictHostKeyChecking", "no");
-            session.setConfig(config);
-
-            //jsch.addIdentity(identityfile);
+            jsch.addIdentity(identityfile, passPhrase);
             session.connect();
 
             channel = session.openChannel("sftp");
