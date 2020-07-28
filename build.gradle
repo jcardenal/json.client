@@ -21,6 +21,7 @@ dependencies {
     compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-xml', version: '2.11.1'
     compile group: 'com.jcraft', name: 'jsch', version: '0.1.55'
     compileOnly 'org.projectlombok:lombok:1.18.12'
+    implementation "io.reactivex.rxjava2:rxjava:2.2.19"
     annotationProcessor 'org.projectlombok:lombok:1.18.12'
     testCompileOnly 'org.projectlombok:lombok:1.18.12'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.12'

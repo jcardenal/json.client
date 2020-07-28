@@ -7,6 +7,8 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.jcraft.jsch.*;
 import es.jcardenal.examples.json.client.dtos.SimpleProductDTO;
+import io.reactivex.Observable;
+import io.reactivex.disposables.Disposable;
 import org.jsfr.json.JsonSurferJackson;
 import org.jsfr.json.compiler.JsonPathCompiler;
 
@@ -43,16 +45,17 @@ public class JSONClient {
         PrintWriter printWriter = new PrintWriter(outputChannel.put(outputFileName), true);
 
         Iterator<Object> iterator = JsonSurferJackson.INSTANCE.iterator(connection.getInputStream(), JsonPathCompiler.compile("$.*"));
-        Stream<Object> tokenStream = StreamSupport.stream(Spliterators.spliteratorUnknownSize(iterator, Spliterator.ORDERED), false);
 
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         xmlMapper.enable(SerializationFeature.INDENT_OUTPUT);
 
-        tokenStream.map(json -> JSONClient.mapToDTO(json, false)).map(JSONClient::mapToXML).forEach(printWriter::print);
+        Observable<Object> tokenStream = Observable.fromIterable(() -> iterator);
+        Disposable disposable = tokenStream.map(json -> JSONClient.mapToDTO(json, false)).map(JSONClient::mapToXML).subscribe(printWriter::print);
 
         connection.disconnect();
         printWriter.close();
         outputChannel.disconnect();
+        disposable.dispose();
 
         long endTime = System.currentTimeMillis();
         System.out.println("Total time(ms) = "+(endTime-startTime));
